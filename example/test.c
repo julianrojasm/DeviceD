@@ -4,7 +4,7 @@
 #include<fcntl.h>
 #include<string.h>
 
-#define BUFFER_SIZE 1024           
+#define BUFFER_SIZE 1025          
 static char receive[BUFFER_SIZE];     
 
 int main() 
@@ -39,19 +39,26 @@ int main()
 			get = write(opening, stringToSend, strlen(stringToSend)); // Send the string to the LKM
 			if (get < 0) 
 			{
-				printf("Failed to write the message to the device.");
+				printf("Failed to write the message to the device.\n");
 				return errno;
 			}
 			break;
 		case 2:
 			printf("Reading from the device...\n");
 			get = read(opening, receive, BUFFER_SIZE);        // Read the response from the LKM
-			if (get < 0) 
+			if (get < 0) //Test if this condition is <= to zero 
 			{
-				printf("Failed to read the message from the device.");
+				printf("Failed to read the message from the device.\n");
 				return errno;
 			}
-			printf("The received message is: %s\n\n", receive);
+			else if (strlen(receive) == 0)
+			{
+				printf("Nothing To Be Read\n\n");
+			}
+			else
+			{
+				printf("The received message is: %s\n\n", receive);
+			}
 			break;
 		case 3:
 			printf("Program Terminating\n");

@@ -22,6 +22,7 @@ MODULE_DESCRIPTION("Character Device Driver");  ///< The description -- see modi
 MODULE_VERSION("0.1");            ///< A version number to inform users
 
 static int    majorNumber;                  ///< Stores the device number -- determined automatically
+static int    i;							///For Use In Loops
 static char   message[BUFFER_SIZE] = { 0 };    ///< Memory for the string that is passed from userspace
 static short  size_of_message;              ///< Used to remember the size of the string stored
 static struct class*  projectdriverClass = NULL; ///< The device-driver class struct pointer
@@ -100,8 +101,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 	if (errors == 0 && size_of_message != 0)
 	{
 		printk(KERN_INFO "Sent %d Characters To User\n", size_of_message);
+		memset(message, '\0', strlen(message));  //THIS IS THE LINE THAT NEEDS TO BE FIXED
 		size_of_message = 0;
-		memset(&message[0], 0, sizeof(message));
 		return size_of_message;
 	}
 	else if (size_of_message == 0)
@@ -117,7 +118,17 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
-	sprintf(message, "%s", buffer);   // appending received string with its length
+	if ((size_of_message + len) > BUFFER_SIZE)
+	{
+		printk(KERN_ALERT "Not Enough Space In Buffer: Only %d Bytes Left", (BUFFER_SIZE - size_of_message));
+		return size_of_message;
+	}
+	
+	//sprintf to temp array and strcat the two together
+	for (i = 0; i < len; i++)
+	{
+		message[size_of_message + i] = buffer[i];
+	}
 	size_of_message = strlen(message);                 // store the length of the stored message
 	printk(KERN_INFO "Received %d characters from the user\n", len);
 	return len;
