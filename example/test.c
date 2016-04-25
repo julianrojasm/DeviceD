@@ -13,7 +13,7 @@ int main()
 	int running = 1;
 	char stringToSend[BUFFER_SIZE];
 
-	printf("Starting Test Code For Device Driver");
+	printf("Starting Test Code For Device Driver\n");
 
 	while (running == 1)
 	{
@@ -56,8 +56,10 @@ int main()
 				printf("Nothing To Be Read\n\n");
 			}
 			else
-			{
+			{	
 				printf("The received message is: %s\n\n", receive);
+				memset(receive, '\0', strlen(receive)); 
+	
 			}
 			break;
 		case 3:

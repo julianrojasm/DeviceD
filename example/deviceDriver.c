@@ -101,7 +101,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 	if (errors == 0 && size_of_message != 0)
 	{
 		printk(KERN_INFO "Sent %d Characters To User\n", size_of_message);
-		memset(message, '\0', strlen(message));  //THIS IS THE LINE THAT NEEDS TO BE FIXED
+		memset(message, '\0', size_of_message);  //THIS IS THE LINE THAT NEEDS TO BE FIXED
 		size_of_message = 0;
 		return size_of_message;
 	}
@@ -120,8 +120,20 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset) {
 	if ((size_of_message + len) > BUFFER_SIZE)
 	{
-		printk(KERN_ALERT "Not Enough Space In Buffer: Only %d Bytes Left", (BUFFER_SIZE - size_of_message));
-		return size_of_message;
+		printk(KERN_ALERT "Not Enough Space In Buffer for all characters, only %d will be added", (BUFFER_SIZE - size_of_message));
+
+		//if buffer size is higher than space available, it will only add until all availablespace is occupied
+		for (i = 0; i < (BUFFER_SIZE - size_of_message); i++)
+		{
+			message[size_of_message + i] = buffer[i];
+		} 
+
+		printk(KERN_INFO "Received %d characters from the user\n", ( BUFFER_SIZE - size_of_message ) );
+
+		size_of_message = strlen(message);
+		
+		return ( BUFFER_SIZE - size_of_message );
+
 	}
 	
 	//sprintf to temp array and strcat the two together

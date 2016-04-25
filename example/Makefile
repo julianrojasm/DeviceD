@@ -1,7 +1,8 @@
-obj-m+=deviceDriverExample.o
+
+obj-m+=deviceDriver.o
  
 all:
-    make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) modules
-    $(CC) exampleTest.c -o test
-clean:
-    make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) clean
+	make -C /lib/modules/4.2.0-35-generic/build M=/home/julianrojasm/DeviceD/example modules
+	$(CC) test.c -o test
+
+
